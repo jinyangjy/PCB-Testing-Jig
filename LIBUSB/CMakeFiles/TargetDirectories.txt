@@ -1,0 +1,3 @@
+/Users/jinyang/Desktop/PCB Testing Jig/libusb/CMakeFiles/main.dir
+/Users/jinyang/Desktop/PCB Testing Jig/libusb/CMakeFiles/edit_cache.dir
+/Users/jinyang/Desktop/PCB Testing Jig/libusb/CMakeFiles/rebuild_cache.dir

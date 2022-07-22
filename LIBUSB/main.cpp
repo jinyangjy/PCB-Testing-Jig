@@ -1,4 +1,4 @@
-#include <libusb-1.0/libusb.h>
+#include <libusb.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -20,53 +20,53 @@
 struct libusb_device_handle *device_handle = NULL;
 
 struct __attribute__((packed)) health_t {
-	uint32_t uptime_pkt;
-	int voltage_pkt;
-	uint32_t current_pkt;
-	uint32_t can_rx_errs_pkt;
-	uint32_t can_send_errs_pkt;
-	uint32_t can_fwd_errs_pkt;
-	uint32_t gmlan_send_errs_pkt;
-	uint32_t faults_pkt;
-	uint8_t ignition_line_pkt;
-	uint8_t ignition_can_pkt;
-	uint8_t controls_allowed_pkt;
-	uint8_t gas_interceptor_detected_pkt;
-	uint8_t car_harness_status_pkt;
-	uint8_t usb_power_mode_pkt;
-	uint8_t safety_mode_pkt;
-	int16_t safety_param_pkt;
-	uint8_t fault_status_pkt;
-	uint8_t power_save_enabled_pkt;
-	uint8_t heartbeat_lost_pkt;
-	uint16_t alternative_experience_pkt;
-	uint32_t blocked_msg_cnt_pkt;
+    uint32_t uptime_pkt;
+    int voltage_pkt;
+    uint32_t current_pkt;
+    uint32_t can_rx_errs_pkt;
+    uint32_t can_send_errs_pkt;
+    uint32_t can_fwd_errs_pkt;
+    uint32_t gmlan_send_errs_pkt;
+    uint32_t faults_pkt;
+    uint8_t ignition_line_pkt;
+    uint8_t ignition_can_pkt;
+    uint8_t controls_allowed_pkt;
+    uint8_t gas_interceptor_detected_pkt;
+    uint8_t car_harness_status_pkt;
+    uint8_t usb_power_mode_pkt;
+    uint8_t safety_mode_pkt;
+    int16_t safety_param_pkt;
+    uint8_t fault_status_pkt;
+    uint8_t power_save_enabled_pkt;
+    uint8_t heartbeat_lost_pkt;
+    uint16_t alternative_experience_pkt;
+    uint32_t blocked_msg_cnt_pkt;
 };
 
 int write_to_safety(uint8_t bRequest, uint16_t wValue, uint16_t wIndex, unsigned int timeout){
-	int err;
-	const uint8_t bmRequestType = LIBUSB_ENDPOINT_OUT | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE;
-    	err = libusb_control_transfer(device_handle, bmRequestType, bRequest, wValue, wIndex, NULL, 0, timeout);	
- 	return err;
+    int err;
+    const uint8_t bmRequestType = LIBUSB_ENDPOINT_OUT | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE;
+    err = libusb_control_transfer(device_handle, bmRequestType, bRequest, wValue, wIndex, NULL, 0, timeout);
+    return err;
 }
 
 int read_from_safety(uint8_t bRequest, uint16_t wValue, uint16_t wIndex, unsigned char *data, uint16_t wLength, unsigned int timeout){
-	int err;
-	const uint8_t bmRequestType = LIBUSB_ENDPOINT_IN | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE;
-	err = libusb_control_transfer(device_handle, bmRequestType, bRequest, wValue, wIndex, data, wLength, timeout);
-	return err;
+    int err;
+    const uint8_t bmRequestType = LIBUSB_ENDPOINT_IN | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE;
+    err = libusb_control_transfer(device_handle, bmRequestType, bRequest, wValue, wIndex, data, wLength, timeout);
+    return err;
 }
 
 bool send_heartbeat(bool Heartbeat_YesOrNo){
-	return write_to_safety(0xf3, Heartbeat_YesOrNo, 0, 0);
+    return write_to_safety(0xf3, Heartbeat_YesOrNo, 0, 0);
 }
 
-int enable_green_light(uint16_t green_light){	
-	return write_to_safety(0xf7, green_light, 0, 0);
+int enable_green_light(uint16_t green_light){
+    return write_to_safety(0xf7, green_light, 0, 0);
 }
 
 int set_fan_power(uint16_t fan_power){
-	return write_to_safety(0xb1,fan_power, 0, 0);
+    return write_to_safety(0xb1,fan_power, 0, 0);
 }
 
 
@@ -79,10 +79,7 @@ int set_fan_power(uint16_t fan_power){
 //argv (argument vector), is an array of pointers to arrays of character objects.
 // -1 was inserted to inform user if there's a possibility of an error throughout this code
 
-int main( int argc, char **argv){	
-    char value_str[8]; // 8-byte buffer to store string values read from device
-    // (7 byte string + Null terminating character)
-
+int main( int argc, char **argv){
     // Initialize libusb
     int result = libusb_init(NULL);
     if (result < 0) {
@@ -91,7 +88,7 @@ int main( int argc, char **argv){
     }
     // Set debugging output to max_level
     libusb_set_option(NULL, LIBUSB_OPTION_LOG_LEVEL, LIBUSB_LOG_LEVEL_WARNING);
-	
+
 
 // If initialisation = successful:
 //      - attempt to open the connected USB device
@@ -123,37 +120,36 @@ int main( int argc, char **argv){
         exit(-3);
     }
     if (result >= 0){
-	    printf("you're connected hehe \n");
+        printf("you're connected hehe \n");
     }
     if (enable_green_light(1) < 0){
-	    printf("there's an error turning on the green light\n");
+        printf("there's an error turning on the green light\n");
     }
     else{
-	    printf("there's a green light\n");
+        printf("there's a green light\n");
     }
     if (set_fan_power(100) < 0){
-	    printf("there's an error switching on the fan\n");
+        printf("there's an error switching on the fan\n");
     }
     else{
-	    printf("the fan's spinning.\n");
+        printf("the fan's spinning.\n");
     }
 
-    health_t health{0};
-    int err = read_from_safety(0xd2, 0, 0, (unsigned char*)&health, sizeof(health), 0);	
-    
+    health_t health;
+    int err = read_from_safety(0xd2, 0, 0, (unsigned char*)&health, sizeof(health), 0);
+
     printf("The value for voltage packet is %d\n", health.voltage_pkt);
     printf("The value for uptime is %d\n", health.uptime_pkt);
-    printf("Error code is %s\n", libusb_error_name(err));   
+    printf("Error code is %s\n", libusb_error_name(err));
 
     int heartbeat_count = 0;
     while(true){
-	    send_heartbeat(true);
-	    set_fan_power(100);
-	    heartbeat_count += 1;
-   	    printf("There's a heartbeat sending to the STM Board, heartbeat = %d\n", heartbeat_count);
+        send_heartbeat(true);
+        set_fan_power(100);
+        heartbeat_count += 1;
+        printf("There's a heartbeat sending to the STM Board, heartbeat = %d\n", heartbeat_count);
     }
     if (send_heartbeat(false)){
-	    printf("the device is not powered");
+        printf("the device is not powered");
     }
 }
-
